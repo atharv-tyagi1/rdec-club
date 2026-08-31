@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, X } from "lucide-react";
 import type { Club } from "../data/clubs";
@@ -66,6 +66,49 @@ export default function ClubExpander({ active, expanded, touch, reduced, onNavig
       document.body.style.overflow = "";
     };
   }, [active]);
+
+  /* Pointer-leave auto-collapse (desktop only).
+     The card stays open only while the pointer sits on the expanded card or
+     the original thumbnail. Once the pointer leaves both, it collapses back
+     after a short debounce — no need to hunt for the close button. Touch
+     devices keep the tap-to-expand / tap-outside-to-close model. */
+  const collapseTimer = useRef<number | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!expanded || touch || !active) return;
+
+    const inRect = (r: Rect, x: number, y: number) =>
+      x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
+
+    const isHot = (x: number, y: number) =>
+      inRect(computeTarget(), x, y) || inRect(active.rect, x, y);
+
+    const cancelCollapse = () => {
+      if (collapseTimer.current) {
+        window.clearTimeout(collapseTimer.current);
+        collapseTimer.current = null;
+      }
+    };
+
+    const onMove = (e: PointerEvent) => {
+      if (isHot(e.clientX, e.clientY)) {
+        cancelCollapse();
+      } else if (!collapseTimer.current) {
+        collapseTimer.current = window.setTimeout(() => {
+          collapseTimer.current = null;
+          onCloseRef.current();
+        }, 400);
+      }
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      cancelCollapse();
+    };
+  }, [expanded, touch, active]);
 
   if (!active) return null;
 
