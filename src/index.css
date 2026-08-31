@@ -1,1 +1,196 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+
+  --color-ink: #17181c;
+  --color-coal: #22242b;
+  --color-paper: #f2f1eb;
+  --color-bone: #e7e5db;
+  --color-smoke: #82848c;
+  --color-maroon: #7c2130;
+  --color-gild: #c99a3c;
+
+  --ease-soft: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink font-body antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #7c2130;
+  color: #f2f1eb;
+}
+
+/* ---- film grain over everything ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  opacity: 0.045;
+  animation: grain 1.2s steps(4) infinite;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1.5%, 1%); }
+  50% { transform: translate(1%, -1.5%); }
+  75% { transform: translate(-1%, -1%); }
+  100% { transform: translate(1.5%, 1%); }
+}
+
+/* ---- scroll reveal ---- */
+.rv {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity var(--rv-dur, 0.8s) var(--ease-soft),
+    transform var(--rv-dur, 0.8s) var(--ease-soft);
+  transition-delay: var(--rv-delay, 0ms);
+}
+.rv-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- line-mask rise for masthead ---- */
+.rise-line {
+  display: block;
+  overflow: hidden;
+}
+.rise-line > span {
+  display: block;
+  transform: translateY(112%);
+  animation: rise 1s var(--ease-soft) forwards;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@keyframes rise {
+  to { transform: translateY(0); }
+}
+
+/* ---- marquee ---- */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ---- slow rotating stamp ---- */
+.spin-slow {
+  animation: spin 26s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- ken burns breathing ---- */
+.breathe {
+  animation: breathe 16s ease-in-out infinite alternate;
+}
+@keyframes breathe {
+  from { transform: scale(1) translateY(0); }
+  to { transform: scale(1.07) translateY(-1.5%); }
+}
+
+/* ---- scroll cue line ---- */
+.cue-line {
+  animation: cue 2.2s var(--ease-soft) infinite;
+  transform-origin: top;
+}
+@keyframes cue {
+  0% { transform: scaleY(0); opacity: 0; }
+  35% { transform: scaleY(1); opacity: 1; }
+  75% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* ---- editorial drop cap ---- */
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.82;
+  padding-right: 0.14em;
+  padding-top: 0.06em;
+  color: var(--club-deep, #7c2130);
+}
+
+/* ---- animated underline for links ---- */
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s var(--ease-soft);
+}
+.link-line:hover {
+  background-size: 100% 1px;
+}
+
+/* ---- outlined display numerals ---- */
+.text-hollow {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--club, #7c2130);
+}
+
+/* ---- thin editorial scrollbar ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #b9b7ac transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #b9b7ac;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  body::after,
+  .marquee-track,
+  .spin-slow,
+  .breathe,
+  .cue-line {
+    animation: none !important;
+  }
+  .rise-line > span {
+    animation: none;
+    transform: none;
+  }
+  .rv {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
