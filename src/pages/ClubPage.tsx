@@ -13,6 +13,10 @@ export default function ClubPage() {
   if (!club) return <Navigate to="/clubs" replace />;
 
   const next = nextClub(club.id);
+  /* editorial rhythm — even-numbered clubs mirror the hero composition, and
+     each club gets its own cover crop so no two pages open identically */
+  const flip = club.no % 2 === 0;
+  const heroAspect = ["aspect-[4/3]", "aspect-[5/4]", "aspect-[3/2]"][club.no % 3];
   const theme = {
     "--club": club.accent,
     "--club-deep": club.accentDeep,
@@ -32,7 +36,9 @@ export default function ClubPage() {
           className="pointer-events-none absolute inset-0 h-full w-full"
         />
         <p
-          className="text-hollow pointer-events-none absolute -top-6 right-0 hidden select-none font-display text-[22rem] font-bold leading-none lg:block"
+          className={`text-hollow pointer-events-none absolute -top-6 hidden select-none font-display text-[22rem] font-bold leading-none lg:block ${
+            flip ? "left-0" : "right-0"
+          }`}
           aria-hidden="true"
         >
           0{club.no}
@@ -40,7 +46,7 @@ export default function ClubPage() {
 
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid items-end gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-6">
+            <div className={`lg:col-span-6 ${flip ? "lg:order-2" : ""}`}>
               <Reveal>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.24em] text-ink/60">
@@ -107,9 +113,11 @@ export default function ClubPage() {
               </Reveal>
             </div>
 
-            <div className="relative lg:col-span-6">
+            <div className={`relative lg:col-span-6 ${flip ? "lg:order-1" : ""}`}>
               <span
-                className="absolute inset-0 -z-10 translate-x-4 translate-y-4 border"
+                className={`absolute inset-0 -z-10 border ${
+                  flip ? "-translate-x-4 translate-y-4" : "translate-x-4 translate-y-4"
+                }`}
                 style={{ borderColor: club.accent, opacity: 0.45 }}
                 aria-hidden="true"
               />
@@ -118,12 +126,14 @@ export default function ClubPage() {
                   src={club.gallery[0].src}
                   alt={`${club.name} — cover photograph`}
                   caption={club.gallery[0].caption}
-                  className="aspect-[4/3] lg:aspect-[5/4]"
+                  className={heroAspect}
                 />
               </Reveal>
               <Reveal delay={280}>
                 <span
-                  className="absolute -bottom-4 left-6 px-3 py-1.5 font-mono text-[9.5px] uppercase tracking-[0.2em] shadow-md"
+                  className={`absolute -bottom-4 px-3 py-1.5 font-mono text-[9.5px] uppercase tracking-[0.2em] shadow-md ${
+                    flip ? "right-6" : "left-6"
+                  }`}
                   style={{ background: "#17181c", color: "#f2f1eb" }}
                 >
                   Est. {club.founded}

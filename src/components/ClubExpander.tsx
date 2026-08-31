@@ -171,11 +171,20 @@ export default function ClubExpander({ active, expanded, touch, reduced, onNavig
           transition={{ duration: reduced ? 0 : 0.3, delay: expanded ? dur * 0.55 : 0 }}
           className="absolute inset-0 grid grid-rows-[104px_1fr] md:grid-cols-[38%_1fr] md:grid-rows-1"
         >
-          {/* identity pane */}
+          {/* identity pane — club cover duotoned under the accent */}
           <div
             className="relative flex items-center justify-between overflow-hidden px-6 md:flex-col md:items-start md:justify-between md:p-8"
             style={{ background: club.accent }}
           >
+            {club.gallery[0]?.src && (
+              <img
+                src={club.gallery[0].src}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            <div className="absolute inset-0" style={{ background: club.accent, opacity: 0.84 }} />
             <Pattern motif={club.motif} color={club.onAccent} opacity={0.22} className="absolute inset-0 h-full w-full" />
             <span
               className="relative font-mono text-[10px] uppercase tracking-[0.22em]"
